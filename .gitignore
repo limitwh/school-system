@@ -1,0 +1,33 @@
+# --- Java / Maven (backend) ---
+backend/target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/.flattened-pom.xml
+
+# --- Node / Vue (frontend) ---
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.local
+frontend/.env.local
+frontend/.env.*.local
+
+# --- IDE ---
+.idea/
+*.iml
+.vscode/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+.DS_Store
+
+# --- 日志与临时文件 ---
+*.log
+logs/
+temp/
+
+# --- 敏感配置（本地保留，不上传） ---
+docs/aiconfig.md

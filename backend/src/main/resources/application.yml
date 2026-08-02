@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: school-system-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/school_system
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update          # 开发期自动建表；生产环境改为 validate/none
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+# JWT 配置
+jwt:
+  # 生产环境必须通过环境变量注入，不要使用默认值
+  secret: ${JWT_SECRET:school-system-jwt-secret-key-change-me-in-production-0123456789}
+  expiration: 7200000           # Token 有效期（毫秒）= 2 小时
+  header: Authorization
+  prefix: "Bearer "
+
+logging:
+  level:
+    com.school: debug
