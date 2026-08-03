@@ -31,3 +31,6 @@ temp/
 
 # --- 敏感配置（本地保留，不上传） ---
 docs/aiconfig.md
+
+# --- 本地私有工具脚本（不上传） ---
+scripts/ClearPWDtoGit.ps1
