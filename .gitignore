@@ -34,3 +34,10 @@ docs/aiconfig.md
 
 # --- 本地私有工具脚本（不上传） ---
 scripts/ClearPWDtoGit.ps1
+scripts/RestorePWD.ps1
+
+# --- 密码工具使用说明（本地私有，不上传） ---
+\!!!PWD!!!.md
+
+# --- ClearPWDtoGit 生成的临时 commit 摘要 ---
+COMMIT_MSG.txt
