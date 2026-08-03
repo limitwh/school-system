@@ -4,6 +4,7 @@ import com.school.entity.SysUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,4 +21,7 @@ public interface SysUserRepository extends JpaRepository<SysUser, Long> {
     Optional<SysUser> findByUsernameOrLoginNo(String username, String loginNo);
 
     boolean existsByUsername(String username);
+
+    /** 按状态查询用户（如锁定状态 9） */
+    List<SysUser> findByStatus(Integer status);
 }

@@ -35,7 +35,7 @@
           <p class="line">
             角色：
             <el-tag v-for="r in userStore.roles" :key="r" class="role-tag" size="small" effect="plain">
-              {{ r }}
+              {{ roleTagText(r) }}
             </el-tag>
           </p>
           <el-divider />
@@ -52,9 +52,15 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
+import { ROLE_MAP } from '@/utils/role'
 
 const router = useRouter()
 const userStore = useUserStore()
+
+// 角色编码 → 中文角色名
+function roleTagText(code) {
+  return ROLE_MAP[code]?.name || code
+}
 
 const avatarText = computed(() => {
   const name = userStore.userInfo?.realName || userStore.userInfo?.username || 'U'

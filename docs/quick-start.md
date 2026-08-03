@@ -1,25 +1,33 @@
 # 快速开始
 
-> 前提：已安装 JDK 17+、Maven 3.9、Node.js 18+、PostgreSQL 17
+> 快速启动校务系统。完整手册（环境概览、数据库初始化、测试账号、停止方式、注意事项等）见 `startWeb.md`。
 
-## 后端
+## 环境要求
 
-```bash
-cd backend
+JDK 17+ · Maven 3.9+ · Node.js 18+ · PostgreSQL 17（已启动并创建 `school_system` 库）
+
+## 1. 启动后端（端口 8080）
+
+```powershell
+cd C:\dev\school-system\backend
+$env:DB_USERNAME = 'ai'
+$env:DB_PASSWORD = '<数据库密码，见 startWeb.md>'
 mvn spring-boot:run
 ```
 
-## 前端
+## 2. 启动前端（端口 5173）
 
-```bash
-cd frontend
-npm install
+```powershell
+cd C:\dev\school-system\frontend
+npm install        # 仅首次或依赖变更时
 npm run dev
 ```
 
-## 数据库初始化
+## 3. 访问与测试
 
-```bash
-# 依次执行数据库脚本（需先创建数据库 school_system）
-psql -U postgres -d school_system -f docs/database/schema.sql
-```
+- 打开 http://localhost:5173/ ，使用 `admin / 123456` 登录
+- 更多角色测试账号见 `startWeb.md` 第六节 / `docs/database/testdata.md`
+
+## 4. 停止服务
+
+- 在启动终端按 `Ctrl + C`；或按端口强制终止（命令见 `startWeb.md` 第七节）

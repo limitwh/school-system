@@ -12,16 +12,18 @@ public class LoginResponse {
     private Long userId;
     private String username;
     private String realName;
+    private Integer status;
     private List<String> roles;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(String token, Long userId, String username, String realName, List<String> roles) {
+    public LoginResponse(String token, Long userId, String username, String realName, Integer status, List<String> roles) {
         this.token = token;
         this.userId = userId;
         this.username = username;
         this.realName = realName;
+        this.status = status;
         this.roles = roles;
     }
 
@@ -63,6 +65,14 @@ public class LoginResponse {
 
     public void setRealName(String realName) {
         this.realName = realName;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public List<String> getRoles() {

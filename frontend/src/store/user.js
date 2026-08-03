@@ -20,6 +20,7 @@ export const useUserStore = defineStore('user', {
         userId: data.userId,
         username: data.username,
         realName: data.realName,
+        status: data.status,
         roles: data.roles
       }
       setUser(this.userInfo)
@@ -30,6 +31,13 @@ export const useUserStore = defineStore('user', {
       this.userInfo = data
       setUser(data)
       return data
+    },
+    // 初始密码设置成功后，将状态标记为「正常」
+    markNormal() {
+      if (this.userInfo) {
+        this.userInfo.status = 1
+        setUser(this.userInfo)
+      }
     },
     logout() {
       this.token = ''

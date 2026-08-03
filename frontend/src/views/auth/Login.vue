@@ -8,20 +8,6 @@
         </div>
         <h1 class="brand-title">校务管理系统</h1>
         <p class="brand-subtitle">School Management System</p>
-        <div class="brand-features">
-          <div class="feature-item">
-            <el-icon><User /></el-icon>
-            <span>统一账号登录</span>
-          </div>
-          <div class="feature-item">
-            <el-icon><Lock /></el-icon>
-            <span>角色权限管理</span>
-          </div>
-          <div class="feature-item">
-            <el-icon><DataAnalysis /></el-icon>
-            <span>在线考试与成绩</span>
-          </div>
-        </div>
       </div>
 
       <!-- 右侧表单区 -->
@@ -73,10 +59,6 @@
             {{ loading ? '登录中...' : '登 录' }}
           </el-button>
         </el-form>
-
-        <div class="form-footer">
-          <span>默认管理员账号：admin / 123456</span>
-        </div>
       </div>
     </div>
   </div>
@@ -86,8 +68,9 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { User, Lock, School, DataAnalysis } from '@element-plus/icons-vue'
+import { User, Lock, School } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
+import { getHomePath } from '@/utils/role'
 
 const router = useRouter()
 const route = useRoute()
@@ -133,7 +116,19 @@ async function handleLogin() {
       localStorage.removeItem('school_system_remember')
     }
     ElMessage.success('登录成功')
-    const redirect = route.query.redirect || '/'
+    const status = userStore.userInfo?.status
+    // 初始状态(0)用户：首次登录需设置初始密码
+    if (status === 0) {
+      router.push('/set-password')
+      return
+    }
+    // 密码过期(10)用户：强制修改密码
+    if (status === 10) {
+      router.push('/change-password')
+      return
+    }
+    // 优先跳转登录前访问的页面，否则按角色进入对应首页
+    const redirect = route.query.redirect || getHomePath(userStore.roles)
     router.push(redirect)
   } catch (e) {
     // 错误提示已由 axios 拦截器统一处理
@@ -201,15 +196,6 @@ function handleForgot() {
   opacity: 0.8;
   letter-spacing: 1px;
   margin-bottom: 40px;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-  font-size: 15px;
-  opacity: 0.9;
 }
 
 .form-panel {

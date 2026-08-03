@@ -13,10 +13,10 @@ CREATE TABLE sys_user (
     real_name        VARCHAR(50)  NOT NULL,
     phone            VARCHAR(20),                    -- 联系电话：手机号或固定电话（座机带区号，如 010-12345678）
     email            VARCHAR(100),                   -- 邮箱地址
-    status           SMALLINT DEFAULT 1,             -- 状态枚举：0初始 1正常 2请假 3休学 4转出 5离职 6病假 7退休 8毕业（可扩展）
+    status           SMALLINT DEFAULT 1,             -- 状态枚举：0初始 1正常 2请假 3休学 4转出 5离职 6病假 7退休 8毕业 9锁定 10密码过期
     last_login_time  TIMESTAMP,                      -- 最近一次登录时间
     pwd_fail_count   INT DEFAULT 0,                  -- 密码连续失败次数（达到阈值锁定）
-    pwd_update_time  TIMESTAMP,                      -- 最近一次更新密码时间
+    pwd_update_time  TIMESTAMP,                      -- 密码到期时间（修改密码时间+90天，当前时间晚于它则状态置为密码过期）
     created_at       TIMESTAMP DEFAULT now()
 );
 

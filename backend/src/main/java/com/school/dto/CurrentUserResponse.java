@@ -11,16 +11,18 @@ public class CurrentUserResponse {
     private String username;
     private String realName;
     private String loginNo;
+    private Integer status;
     private List<String> roles;
 
     public CurrentUserResponse() {
     }
 
-    public CurrentUserResponse(Long userId, String username, String realName, String loginNo, List<String> roles) {
+    public CurrentUserResponse(Long userId, String username, String realName, String loginNo, Integer status, List<String> roles) {
         this.userId = userId;
         this.username = username;
         this.realName = realName;
         this.loginNo = loginNo;
+        this.status = status;
         this.roles = roles;
     }
 
@@ -54,6 +56,14 @@ public class CurrentUserResponse {
 
     public void setLoginNo(String loginNo) {
         this.loginNo = loginNo;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public List<String> getRoles() {
