@@ -2,10 +2,14 @@ package com.school.controller.admin;
 
 import com.school.common.Result;
 import com.school.dto.AdminUserResponse;
+import com.school.dto.ResetPasswordByLoginNameRequest;
 import com.school.dto.ResetPasswordRequest;
+import com.school.dto.ResetPasswordResult;
+import com.school.security.LoginUser;
 import com.school.service.AdminUserService;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,5 +49,19 @@ public class AdminUserController {
                                       @RequestBody @Valid ResetPasswordRequest request) {
         adminUserService.resetPassword(id, request);
         return Result.success();
+    }
+
+    /**
+     * 按登录名重置任意用户密码：自动分配默认密码，状态置为初始(0)
+     * <p>
+     * 登录名支持用户名 / 学号 / 职工号（即 sys_user.username 或 sys_user.login_no）。
+     */
+    @PostMapping("/reset-password")
+    public Result<ResetPasswordResult> resetPasswordByLoginName(
+            Authentication authentication,
+            @RequestBody @Valid ResetPasswordByLoginNameRequest request) {
+        LoginUser currentUser = (LoginUser) authentication.getPrincipal();
+        return Result.success(adminUserService.resetPasswordByLoginName(
+                currentUser.getUserId(), request.getLoginName()));
     }
 }

@@ -16,7 +16,8 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item command="change-password">修改密码</el-dropdown-item>
+                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -75,7 +76,9 @@ onMounted(() => {
 })
 
 function handleCommand(command) {
-  if (command === 'logout') {
+  if (command === 'change-password') {
+    router.push('/change-password')
+  } else if (command === 'logout') {
     ElMessageBox.confirm('确定要退出登录吗？', '提示', {
       confirmButtonText: '退出',
       cancelButtonText: '取消',

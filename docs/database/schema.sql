@@ -17,6 +17,7 @@ CREATE TABLE sys_user (
     last_login_time  TIMESTAMP,                      -- 最近一次登录时间
     pwd_fail_count   INT DEFAULT 0,                  -- 密码连续失败次数（达到阈值锁定）
     pwd_update_time  TIMESTAMP,                      -- 密码到期时间（修改密码时间+90天，当前时间晚于它则状态置为密码过期）
+    otp_expire_time  TIMESTAMP,                      -- 一次性密码到期时间（管理员重置后写入，超时需重新重置；设置正式密码后清空）
     created_at       TIMESTAMP DEFAULT now()
 );
 
@@ -257,3 +258,27 @@ CREATE TABLE score (
 -- 成绩表索引：按学期/科目/学生查询
 CREATE INDEX idx_score_term_subject ON score (term, subject_id);
 CREATE INDEX idx_score_student ON score (student_id, term);
+
+-- ============================================================
+-- 系统日志模块
+-- 记录「谁 在什么时间 做了什么操作」，用于安全审计与问题追溯
+-- ============================================================
+
+-- 21. 操作日志表
+CREATE TABLE sys_operation_log (
+    id          BIGSERIAL PRIMARY KEY,
+    user_id     BIGINT,                          -- 操作人 ID（登录失败且账号不存在时为空，不设外键以免影响用户删除）
+    username    VARCHAR(50)  NOT NULL,           -- 操作人登录名快照（失败时=尝试登录的账号）
+    real_name   VARCHAR(50),                     -- 操作人姓名快照
+    module      VARCHAR(30)  NOT NULL,           -- 所属模块：AUTH / USER / ...
+    action      VARCHAR(50)  NOT NULL,           -- 操作类型：LOGIN / LOGOUT / CHANGE_PASSWORD / RESET_PASSWORD / ...
+    detail      VARCHAR(500),                    -- 成功说明或失败原因
+    success     BOOLEAN      NOT NULL,           -- 是否成功
+    ip          VARCHAR(64),                     -- 来源 IP
+    user_agent  VARCHAR(255),                    -- 客户端 User-Agent
+    created_at  TIMESTAMP    NOT NULL DEFAULT now()
+);
+
+-- 日志索引：按时间倒序、按操作人查询
+CREATE INDEX idx_op_log_created ON sys_operation_log (created_at DESC);
+CREATE INDEX idx_op_log_user ON sys_operation_log (username, created_at DESC);

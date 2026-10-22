@@ -59,6 +59,10 @@ public class SysUser {
     @Column(name = "pwd_update_time")
     private LocalDateTime pwdUpdateTime;
 
+    /** 一次性密码到期时间：管理员重置密码后写入，超时则需重新重置；设置正式密码后清空 */
+    @Column(name = "otp_expire_time")
+    private LocalDateTime otpExpireTime;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -155,6 +159,14 @@ public class SysUser {
 
     public void setPwdUpdateTime(LocalDateTime pwdUpdateTime) {
         this.pwdUpdateTime = pwdUpdateTime;
+    }
+
+    public LocalDateTime getOtpExpireTime() {
+        return otpExpireTime;
+    }
+
+    public void setOtpExpireTime(LocalDateTime otpExpireTime) {
+        this.otpExpireTime = otpExpireTime;
     }
 
     public LocalDateTime getCreatedAt() {

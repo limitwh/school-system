@@ -22,6 +22,18 @@ const routes = [
     meta: { title: '管理后台', requiresAuth: true, roles: ['ADMIN'] }
   },
   {
+    path: '/admin/reset-user-password',
+    name: 'AdminResetUserPassword',
+    component: () => import('@/views/admin/ResetUserPassword.vue'),
+    meta: { title: '重置用户密码', requiresAuth: true, roles: ['ADMIN'] }
+  },
+  {
+    path: '/admin/logs',
+    name: 'AdminOperationLogs',
+    component: () => import('@/views/admin/OperationLogs.vue'),
+    meta: { title: '操作日志', requiresAuth: true, roles: ['ADMIN'] }
+  },
+  {
     path: '/principal',
     name: 'PrincipalDashboard',
     component: () => import('@/views/principal/Dashboard.vue'),
@@ -113,11 +125,9 @@ router.beforeEach((to, from, next) => {
     return next('/change-password')
   }
 
-  // 正常状态用户：不能停留在设置密码/修改密码页
-  if (status !== 0 && status !== 10) {
-    if (to.path === '/set-password' || to.path === '/change-password') {
-      return next(getHomePath(user?.roles))
-    }
+  // 正常状态用户：不允许再进入「设置初始密码」；「修改密码」是主动行为，允许访问
+  if (status !== 0 && status !== 10 && to.path === '/set-password') {
+    return next(getHomePath(user?.roles))
   }
 
   // 角色权限校验：无权访问时跳转回自己的角色首页

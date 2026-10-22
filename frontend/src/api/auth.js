@@ -30,3 +30,13 @@ export function setPassword(data) {
 export function changePassword(data) {
   return request.post('/auth/change-password', data)
 }
+
+/**
+ * 退出登录：仅用于后端记录操作日志（JWT 无状态）
+ * @param {string} [token] 显式传入 Token（本地登录态可能已清除）
+ * @param {'MANUAL'|'IDLE'} [reason] 退出原因：手动 / 无操作超时
+ */
+export function logout(token, reason = 'MANUAL') {
+  const config = token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+  return request.post('/auth/logout', { reason }, config)
+}

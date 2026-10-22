@@ -11,6 +11,10 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    watch: {
+      // 忽略编辑器原子写入产生的临时目录，避免文件监听触发 EBUSY 崩溃
+      ignored: ['**/*.tmpdir', '**/*.tmpdir/**']
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8080',

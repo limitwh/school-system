@@ -5,6 +5,7 @@ import com.school.dto.ChangePasswordRequest;
 import com.school.dto.CurrentUserResponse;
 import com.school.dto.LoginRequest;
 import com.school.dto.LoginResponse;
+import com.school.dto.LogoutRequest;
 import com.school.dto.SetPasswordRequest;
 import com.school.security.LoginUser;
 import com.school.service.AuthService;
@@ -75,6 +76,19 @@ public class AuthController {
                                        @RequestBody @Valid ChangePasswordRequest request) {
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         authService.changePassword(loginUser, request);
+        return Result.success();
+    }
+
+    /**
+     * 退出登录：仅记录操作日志（JWT 无状态，服务端不维护会话）
+     * <p>
+     * reason：MANUAL 手动退出 / IDLE 长时间未操作自动退出
+     */
+    @PostMapping("/logout")
+    public Result<Void> logout(Authentication authentication,
+                               @RequestBody(required = false) LogoutRequest request) {
+        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+        authService.logout(loginUser, request == null ? null : request.getReason());
         return Result.success();
     }
 }

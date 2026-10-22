@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { login as loginApi, getMe } from '@/api/auth'
+import { login as loginApi, getMe, logout as logoutApi } from '@/api/auth'
 import { getToken, setToken, removeToken, getUser, setUser } from '@/utils/auth'
+import { clearActivity, markActivity } from '@/utils/idle'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -24,6 +25,8 @@ export const useUserStore = defineStore('user', {
         roles: data.roles
       }
       setUser(this.userInfo)
+      // 登录成功即开始计算空闲时间
+      markActivity()
       return data
     },
     async fetchMe() {
@@ -39,10 +42,18 @@ export const useUserStore = defineStore('user', {
         setUser(this.userInfo)
       }
     },
-    logout() {
+    /**
+     * 退出登录
+     * @param {'MANUAL'|'IDLE'} [reason] 退出原因：手动 / 无操作超时
+     */
+    logout(reason = 'MANUAL') {
+      const token = this.token
       this.token = ''
       this.userInfo = null
       removeToken()
+      clearActivity()
+      // 异步补一条退出日志，失败忽略（JWT 无状态，不影响本地登出）
+      logoutApi(token, reason).catch(() => {})
     }
   }
 })
