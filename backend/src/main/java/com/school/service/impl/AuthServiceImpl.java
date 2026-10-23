@@ -13,6 +13,7 @@ import com.school.security.JwtUtil;
 import com.school.security.LoginUser;
 import com.school.service.AuthService;
 import com.school.service.OperationLogService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +30,9 @@ public class AuthServiceImpl implements AuthService {
     /** 密码连续失败最大次数，达到后锁定 */
     private static final int MAX_FAIL_COUNT = 4;
 
-    /** 密码有效期（天）：修改密码后 N 天内有效，超过则状态置为「密码过期」 */
-    private static final long PASSWORD_VALID_DAYS = 90;
+    /** 密码有效期（天），可通过 app.password.valid-days 配置；管理员（ADMIN）不受限制 */
+    @Value("${app.password.valid-days:90}")
+    private long passwordValidDays;
 
     private final SysUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -102,6 +104,10 @@ public class AuthServiceImpl implements AuthService {
             // 登录成功：重置失败次数、更新最近登录时间
             user.setPwdFailCount(0);
             user.setLastLoginTime(LocalDateTime.now());
+            // 非管理员账号若从未设置过有效期（历史数据或直接插入的账号），本次登录起开始计时
+            if (!isAdmin(user) && user.getPwdUpdateTime() == null) {
+                user.setPwdUpdateTime(LocalDateTime.now().plusDays(passwordValidDays));
+            }
             userRepository.save(user);
 
             // 签发 JWT
@@ -142,8 +148,8 @@ public class AuthServiceImpl implements AuthService {
         user.setPwdFailCount(0);
         // 设置正式密码后，一次性密码时效作废
         user.setOtpExpireTime(null);
-        // 记录密码到期时间：修改时间 + 90 天
-        user.setPwdUpdateTime(LocalDateTime.now().plusDays(PASSWORD_VALID_DAYS));
+        // 记录密码到期时间（管理员不设过期）
+        user.setPwdUpdateTime(expireAtFor(user));
         userRepository.save(user);
 
         operationLogService.logCurrent("AUTH", "SET_PASSWORD", "首次登录设置初始密码", true);
@@ -170,9 +176,9 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(400, "新密码不能与原密码相同");
         }
 
-        // 更新密码、记录到期时间（修改时间 + 90 天）、状态置为正常、清除失败计数
+        // 更新密码、记录到期时间（管理员不设过期）、状态置为正常、清除失败计数
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        user.setPwdUpdateTime(LocalDateTime.now().plusDays(PASSWORD_VALID_DAYS));
+        user.setPwdUpdateTime(expireAtFor(user));
         user.setStatus(UserStatus.NORMAL);
         user.setPwdFailCount(0);
         userRepository.save(user);
@@ -188,10 +194,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * 判断密码是否已过期：pwd_update_time 存储到期时间，当前时间晚于到期时间即过期
+     * 判断密码是否已过期：pwd_update_time 存储到期时间，当前时间晚于到期时间即过期。
+     * 管理员（ADMIN）不受密码有效期限制。
      */
     private boolean isPasswordExpired(SysUser user) {
+        if (isAdmin(user)) {
+            return false;
+        }
         return user.getPwdUpdateTime() != null
                 && LocalDateTime.now().isAfter(user.getPwdUpdateTime());
+    }
+
+    /** 是否为系统管理员（拥有 ADMIN 角色） */
+    private boolean isAdmin(SysUser user) {
+        return user.getRoles().stream()
+                .anyMatch(role -> "ADMIN".equals(role.getCode()));
+    }
+
+    /** 计算密码到期时间：管理员返回 null（永不过期），其他用户为当前时间 + 有效期 */
+    private LocalDateTime expireAtFor(SysUser user) {
+        return isAdmin(user) ? null : LocalDateTime.now().plusDays(passwordValidDays);
     }
 }

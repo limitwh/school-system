@@ -67,7 +67,8 @@ CREATE TABLE class (
     grade_id       BIGINT NOT NULL REFERENCES grade(id),
     is_graduated   BOOLEAN DEFAULT FALSE,      -- 是否已毕业离校
     graduate_time  TIMESTAMP,                  -- 毕业归档时间
-    created_at     TIMESTAMP DEFAULT now()
+    created_at     TIMESTAMP DEFAULT now(),
+    UNIQUE (grade_id, name)                    -- 同一年级下班级名唯一
 );
 
 -- 6. 教师表（业务扩展，与 sys_user 一对一）
@@ -282,3 +283,66 @@ CREATE TABLE sys_operation_log (
 -- 日志索引：按时间倒序、按操作人查询
 CREATE INDEX idx_op_log_created ON sys_operation_log (created_at DESC);
 CREATE INDEX idx_op_log_user ON sys_operation_log (username, created_at DESC);
+
+-- ============================================================
+-- 消息模块（1:1 单聊，GROUP 类型为后续群聊预留）
+-- ============================================================
+
+-- 22. 消息会话
+CREATE TABLE msg_conversation (
+    id          BIGSERIAL PRIMARY KEY,
+    type        VARCHAR(10)  NOT NULL DEFAULT 'SINGLE',   -- SINGLE 单聊 / GROUP 群聊（预留）
+    title       VARCHAR(100),                              -- 群聊名称（单聊为空）
+    pair_key    VARCHAR(50)  UNIQUE,                       -- 单聊去重键：小用户ID_大用户ID
+    created_by  BIGINT REFERENCES sys_user(id),
+    created_at  TIMESTAMP    NOT NULL DEFAULT now()
+);
+
+-- 23. 会话成员（含已读位置）
+CREATE TABLE msg_conversation_member (
+    id                    BIGSERIAL PRIMARY KEY,
+    conversation_id       BIGINT NOT NULL REFERENCES msg_conversation(id),
+    user_id               BIGINT NOT NULL REFERENCES sys_user(id),
+    last_read_message_id  BIGINT,                          -- 该成员已读到的最大消息 ID
+    joined_at             TIMESTAMP NOT NULL DEFAULT now(),
+    UNIQUE (conversation_id, user_id)
+);
+CREATE INDEX idx_msg_member_user ON msg_conversation_member (user_id);
+
+-- 24. 消息
+CREATE TABLE msg_message (
+    id               BIGSERIAL PRIMARY KEY,
+    conversation_id  BIGINT NOT NULL REFERENCES msg_conversation(id),
+    sender_id        BIGINT NOT NULL REFERENCES sys_user(id),
+    content          TEXT NOT NULL,
+    content_type     VARCHAR(10) NOT NULL DEFAULT 'TEXT',  -- TEXT（预留 IMAGE / FILE）
+    created_at       TIMESTAMP NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_msg_message_conv ON msg_message (conversation_id, id DESC);
+
+-- ============================================================
+-- 学籍基础数据补充
+-- ============================================================
+
+-- 25. 学年表：统一下级口径，升级/成绩/考试都引用
+CREATE TABLE school_year (
+    id         BIGSERIAL PRIMARY KEY,
+    name       VARCHAR(20) NOT NULL UNIQUE,   -- 如 2025-2026
+    start_date DATE NOT NULL,
+    end_date   DATE NOT NULL,
+    is_current BOOLEAN NOT NULL DEFAULT FALSE -- 当前学年（全表最多一条为 true）
+);
+
+-- 26. 学生年级/班级变更历史
+CREATE TABLE student_grade_history (
+    id             BIGSERIAL PRIMARY KEY,
+    student_id     BIGINT NOT NULL REFERENCES student(id),
+    from_class_id  BIGINT REFERENCES class(id),
+    to_class_id    BIGINT REFERENCES class(id),
+    change_type    VARCHAR(20) NOT NULL,      -- PROMOTE/TRANSFER_IN/REPEAT/SKIP/ADJUST/GRADUATE
+    school_year_id BIGINT REFERENCES school_year(id),
+    operator_id    BIGINT REFERENCES sys_user(id),
+    remark         VARCHAR(200),
+    created_at     TIMESTAMP NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_sgh_student ON student_grade_history (student_id);

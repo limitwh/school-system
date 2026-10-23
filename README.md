@@ -68,18 +68,20 @@
 | 模块 | 说明 | 设计文档 |
 |------|------|---------|
 | 权限管理 | 角色体系、数据范围、登录名规则 | [`docs/database/schema.sql`](docs/database/schema.sql) |
-| 学籍流转 | 批量入学、升年级、毕业离校 | [`docs/database/academic-flow.md`](docs/database/academic-flow.md) |
+| 学籍管理 | 年级（小学6+初中3）、班级、学生档案、学年；批量入学、升年级、毕业 | [`docs/database/academic-flow.md`](docs/database/academic-flow.md) |
 | 在线考试 | 题库、试卷、考试、阅卷 | [`docs/database/exam-module.md`](docs/database/exam-module.md) |
 | 成绩单 | 成绩记录、排名、按角色数据权限 | [`docs/database/score-report.md`](docs/database/score-report.md) |
 | 系统日志 | 操作审计：谁在什么时间做了什么操作（登录/登出/改密/重置密码等） | [`docs/database/schema.sql`](docs/database/schema.sql) |
+| 消息 | 用户间 1:1 单聊、未读提醒、轮询新消息 | [`docs/database/message-module.md`](docs/database/message-module.md) |
 
 ## 会话与安全
 
-- 密码连续输错 4 次锁定账号；密码 90 天过期强制修改。
+- 密码连续输错 4 次锁定账号；除系统管理员（ADMIN）外，其他用户密码 **90 天**过期强制修改（`app.password.valid-days` 可配置）。
 - 管理员重置的密码为一次性随机密码，24 小时内有效，首次登录强制改密。
 - 登录后连续 **5 分钟无任何操作自动退出**（前端空闲检测，时长见 `frontend/src/utils/idle.js` 的 `IDLE_TIMEOUT_MS`）。
 - 登录、退出、改密、重置密码等关键操作写入 `sys_operation_log`，管理员可在「操作日志」页查询。
 - 操作日志默认保留 **30 天**，每天 **03:00** 自动归档为 JSONL 文件（`backend/logs/archive`）并从库中清理；管理员也可手动触发归档。
+- **消息内容不写入操作日志**（`msg_message` 本身即记录），避免隐私扩散与日志膨胀。
 
 ## 项目结构
 

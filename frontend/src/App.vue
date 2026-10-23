@@ -3,14 +3,16 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount } from 'vue'
+import { onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/user'
+import { useMessageStore } from '@/store/message'
 import { IDLE_TIMEOUT_MS, clearActivity, getIdleMillis, markActivity } from '@/utils/idle'
 
 const router = useRouter()
 const userStore = useUserStore()
+const messageStore = useMessageStore()
 
 /** 视为「用户有操作」的事件 */
 const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'scroll', 'wheel', 'touchstart', 'click']
@@ -21,6 +23,7 @@ const CHECK_INTERVAL_MS = 10000
 const TOKEN_KEY = 'school_system_token'
 
 let checkTimer = null
+let unreadTimer = null
 let lastMarkAt = 0
 let loggingOut = false
 
@@ -48,6 +51,14 @@ function handleStorage(event) {
 function handleVisibility() {
   if (document.visibilityState === 'visible') {
     checkIdle()
+    refreshUnread()
+  }
+}
+
+/** 刷新全局未读数（顶部消息角标） */
+function refreshUnread() {
+  if (userStore.isLoggedIn) {
+    messageStore.refreshUnread()
   }
 }
 
@@ -96,6 +107,10 @@ onMounted(() => {
   document.addEventListener('visibilitychange', handleVisibility)
 
   checkTimer = window.setInterval(checkIdle, CHECK_INTERVAL_MS)
+
+  // 消息未读数定时刷新（30 秒）
+  refreshUnread()
+  unreadTimer = window.setInterval(refreshUnread, 30000)
 })
 
 onBeforeUnmount(() => {
@@ -105,7 +120,20 @@ onBeforeUnmount(() => {
   if (checkTimer) {
     window.clearInterval(checkTimer)
   }
+  if (unreadTimer) {
+    window.clearInterval(unreadTimer)
+  }
 })
+
+// 退出登录后清空未读角标
+watch(
+  () => userStore.token,
+  (token) => {
+    if (!token) {
+      messageStore.reset()
+    }
+  }
+)
 </script>
 
 <style>

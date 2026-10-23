@@ -2,6 +2,10 @@
   <WelcomeDashboard role-suffix="管理员">
     <template #actions>
       <div class="admin-actions">
+        <el-button type="primary" plain @click="$router.push('/admin/academic')">
+          <el-icon style="margin-right: 6px"><Management /></el-icon>
+          学籍管理
+        </el-button>
         <el-button type="primary" plain @click="$router.push('/admin/reset-user-password')">
           <el-icon style="margin-right: 6px"><Key /></el-icon>
           重置用户密码

@@ -1,7 +1,10 @@
 package com.school.repository;
 
 import com.school.entity.SysUser;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,4 +27,14 @@ public interface SysUserRepository extends JpaRepository<SysUser, Long> {
 
     /** 按状态查询用户（如锁定状态 9） */
     List<SysUser> findByStatus(Integer status);
+
+    /** 搜索可发消息的活跃用户（排除自己；keyword 为空时返回前若干人） */
+    @Query("select u from SysUser u where u.id <> :userId and u.status = 1 " +
+            "and (:keyword is null " +
+            "     or lower(u.username) like lower(concat('%', :keyword, '%')) " +
+            "     or lower(u.realName) like lower(concat('%', :keyword, '%'))) " +
+            "order by u.realName")
+    List<SysUser> searchActiveUsers(@Param("userId") Long userId,
+                                    @Param("keyword") String keyword,
+                                    Pageable pageable);
 }

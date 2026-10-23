@@ -16,6 +16,12 @@ const routes = [
     meta: { title: '首页', requiresAuth: true }
   },
   {
+    path: '/messages',
+    name: 'MessageCenter',
+    component: () => import('@/views/message/MessageCenter.vue'),
+    meta: { title: '消息中心', requiresAuth: true }
+  },
+  {
     path: '/admin',
     name: 'AdminDashboard',
     component: () => import('@/views/admin/Dashboard.vue'),
@@ -32,6 +38,12 @@ const routes = [
     name: 'AdminOperationLogs',
     component: () => import('@/views/admin/OperationLogs.vue'),
     meta: { title: '操作日志', requiresAuth: true, roles: ['ADMIN'] }
+  },
+  {
+    path: '/admin/academic',
+    name: 'AdminAcademic',
+    component: () => import('@/views/admin/AcademicManagement.vue'),
+    meta: { title: '学籍管理', requiresAuth: true, roles: ['ADMIN'] }
   },
   {
     path: '/principal',

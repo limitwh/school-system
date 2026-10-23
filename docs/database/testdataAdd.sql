@@ -9,17 +9,18 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 1) 插入用户
-INSERT INTO sys_user (username, login_no, password, real_name, status) VALUES
-    ('admin-test1',        'admin-test1',        crypt('123456', gen_salt('bf')), '张一管理员test',     1),
-    ('admin-test2',        'admin-test2',        crypt('123456', gen_salt('bf')), '张二管理员test',     1),
-    ('principal-test1',    'principal-test1',    crypt('123456', gen_salt('bf')), '李一校长test',       1),
-    ('principal-test2',    'principal-test2',    crypt('123456', gen_salt('bf')), '李二校长test',       1),
-    ('grade-admin-test1',  'grade-admin-test1',  crypt('123456', gen_salt('bf')), '王一年级管理员test', 1),
-    ('grade-admin-test2',  'grade-admin-test2',  crypt('123456', gen_salt('bf')), '王二年级管理员test', 1),
-    ('teacher-test1',      'teacher-test1',      crypt('123456', gen_salt('bf')), '赵一老师test',       1),
-    ('teacher-test2',      'teacher-test2',      crypt('123456', gen_salt('bf')), '赵二老师test',       1),
-    ('student-test1',      'student-test1',      crypt('123456', gen_salt('bf')), '孙一同学test',       1),
-    ('student-test2',      'student-test2',      crypt('123456', gen_salt('bf')), '孙二同学test',       1)
+--    pwd_update_time 为密码到期时间：非管理员用户 90 天后需强制改密（管理员不受限制）
+INSERT INTO sys_user (username, login_no, password, real_name, status, pwd_update_time) VALUES
+    ('admin-test1',        'admin-test1',        crypt('123456', gen_salt('bf')), '张一管理员test',     1, now() + interval '90 days'),
+    ('admin-test2',        'admin-test2',        crypt('123456', gen_salt('bf')), '张二管理员test',     1, now() + interval '90 days'),
+    ('principal-test1',    'principal-test1',    crypt('123456', gen_salt('bf')), '李一校长test',       1, now() + interval '90 days'),
+    ('principal-test2',    'principal-test2',    crypt('123456', gen_salt('bf')), '李二校长test',       1, now() + interval '90 days'),
+    ('grade-admin-test1',  'grade-admin-test1',  crypt('123456', gen_salt('bf')), '王一年级管理员test', 1, now() + interval '90 days'),
+    ('grade-admin-test2',  'grade-admin-test2',  crypt('123456', gen_salt('bf')), '王二年级管理员test', 1, now() + interval '90 days'),
+    ('teacher-test1',      'teacher-test1',      crypt('123456', gen_salt('bf')), '赵一老师test',       1, now() + interval '90 days'),
+    ('teacher-test2',      'teacher-test2',      crypt('123456', gen_salt('bf')), '赵二老师test',       1, now() + interval '90 days'),
+    ('student-test1',      'student-test1',      crypt('123456', gen_salt('bf')), '孙一同学test',       1, now() + interval '90 days'),
+    ('student-test2',      'student-test2',      crypt('123456', gen_salt('bf')), '孙二同学test',       1, now() + interval '90 days')
 ON CONFLICT (username) DO NOTHING;
 
 -- 2) 用户-角色关联（按角色编码取 role_id，幂等）

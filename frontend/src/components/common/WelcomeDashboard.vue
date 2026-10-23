@@ -8,6 +8,7 @@
           <span class="logo-text">校务管理系统</span>
         </div>
         <div class="header-right">
+          <MessageBell />
           <el-dropdown @command="handleCommand">
             <span class="user-info">
               <el-avatar :size="32" class="avatar">{{ avatarText }}</el-avatar>
@@ -79,6 +80,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import { ROLE_MAP } from '@/utils/role'
+import MessageBell from '@/components/common/MessageBell.vue'
 
 // 欢迎语称呼后缀：同学 / 老师 / 校长 / 管理员 / 年级管理员
 const props = defineProps({

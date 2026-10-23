@@ -6,6 +6,7 @@
           <span class="logo-text">校务管理系统</span>
         </div>
         <div class="header-right">
+          <MessageBell />
           <el-dropdown @command="handleCommand">
             <span class="user-info">
               <el-avatar :size="32" class="avatar">{{ avatarText }}</el-avatar>
@@ -54,6 +55,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import { ROLE_MAP } from '@/utils/role'
+import MessageBell from '@/components/common/MessageBell.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
