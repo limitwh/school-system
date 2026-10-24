@@ -41,3 +41,6 @@ scripts/RestorePWD.ps1
 
 # --- ClearPWDtoGit 生成的临时 commit 摘要 ---
 COMMIT_MSG.txt
+
+# --- DSH 本地 skill（仅本机，不随仓库上传） ---
+.dsh/
