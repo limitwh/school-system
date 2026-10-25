@@ -69,6 +69,7 @@
 |------|------|---------|
 | 权限管理 | 角色体系、数据范围、登录名规则 | [`docs/database/schema.sql`](docs/database/schema.sql) |
 | 学籍管理 | 年级（小学6+初中3）、班级、学生档案、学年；批量入学、升年级、毕业 | [`docs/database/academic-flow.md`](docs/database/academic-flow.md) |
+| 课程表 | 年级课程计划、节次作息、班级周课表、冲突校验 | [`docs/database/timetable-module.md`](docs/database/timetable-module.md) |
 | 在线考试 | 题库、试卷、考试、阅卷 | [`docs/database/exam-module.md`](docs/database/exam-module.md) |
 | 成绩单 | 成绩记录、排名、按角色数据权限 | [`docs/database/score-report.md`](docs/database/score-report.md) |
 | 系统日志 | 操作审计：谁在什么时间做了什么操作（登录/登出/改密/重置密码等） | [`docs/database/schema.sql`](docs/database/schema.sql) |

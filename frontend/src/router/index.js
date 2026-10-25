@@ -46,6 +46,12 @@ const routes = [
     meta: { title: '学籍管理', requiresAuth: true, roles: ['ADMIN'] }
   },
   {
+    path: '/admin/timetable',
+    name: 'AdminTimetable',
+    component: () => import('@/views/admin/TimetableManagement.vue'),
+    meta: { title: '课程表', requiresAuth: true, roles: ['ADMIN'] }
+  },
+  {
     path: '/principal',
     name: 'PrincipalDashboard',
     component: () => import('@/views/principal/Dashboard.vue'),

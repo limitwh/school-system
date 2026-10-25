@@ -127,6 +127,7 @@ CREATE TABLE subject (
     id         BIGSERIAL PRIMARY KEY,
     name       VARCHAR(50) NOT NULL UNIQUE,      -- 数学 / 语文 / 英语
     code       VARCHAR(20) UNIQUE,               -- MATH / CHINESE / ENGLISH
+    category   VARCHAR(20) DEFAULT 'ACADEMIC',   -- ACADEMIC 学科 / ACTIVITY 非学科（音乐、班会、自习）
     enabled    SMALLINT DEFAULT 1,               -- 1启用 0停用
     sort_order INT
 );
@@ -346,3 +347,49 @@ CREATE TABLE student_grade_history (
     created_at     TIMESTAMP NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_sgh_student ON student_grade_history (student_id);
+
+-- ============================================================
+-- 课程表模块
+-- ============================================================
+
+-- 27. 年级课程计划：每个年级每门课每周几节
+CREATE TABLE grade_subject (
+    id             BIGSERIAL PRIMARY KEY,
+    grade_id       BIGINT NOT NULL REFERENCES grade(id),
+    subject_id     BIGINT NOT NULL REFERENCES subject(id),
+    weekly_periods INT NOT NULL,
+    UNIQUE (grade_id, subject_id)
+);
+
+-- 28. 节次作息（小学/初中两套）
+CREATE TABLE period (
+    id         BIGSERIAL PRIMARY KEY,
+    stage      VARCHAR(20) NOT NULL,   -- PRIMARY / JUNIOR
+    period_no  INT NOT NULL,
+    start_time TIME NOT NULL,
+    end_time   TIME NOT NULL,
+    UNIQUE (stage, period_no)
+);
+
+-- 29. 班级课表头：一个班在一个学年/学期一张课表
+CREATE TABLE timetable (
+    id             BIGSERIAL PRIMARY KEY,
+    class_id       BIGINT NOT NULL REFERENCES class(id),
+    school_year_id BIGINT NOT NULL REFERENCES school_year(id),
+    term           SMALLINT NOT NULL,  -- 1 上学期 / 2 下学期
+    created_at     TIMESTAMP NOT NULL DEFAULT now(),
+    UNIQUE (class_id, school_year_id, term)
+);
+
+-- 30. 课表条目
+CREATE TABLE timetable_entry (
+    id           BIGSERIAL PRIMARY KEY,
+    timetable_id BIGINT NOT NULL REFERENCES timetable(id),
+    weekday      SMALLINT NOT NULL,   -- 1~5
+    period_no    INT NOT NULL,
+    subject_id   BIGINT NOT NULL REFERENCES subject(id),
+    teacher_id   BIGINT REFERENCES teacher(id),  -- 第一版留空，预留教师排课
+    UNIQUE (timetable_id, weekday, period_no)
+);
+CREATE INDEX idx_entry_teacher ON timetable_entry (teacher_id);
+CREATE INDEX idx_entry_subject ON timetable_entry (subject_id);

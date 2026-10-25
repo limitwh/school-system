@@ -34,9 +34,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("select s from Student s, SysUser u where s.userId = u.id " +
             "and (:classId is null or s.classId = :classId) " +
             "and (:keyword is null " +
-            "     or lower(u.realName) like lower(concat('%', :keyword, '%')) " +
-            "     or lower(u.username) like lower(concat('%', :keyword, '%')) " +
-            "     or lower(s.studentNo) like lower(concat('%', :keyword, '%'))) " +
+            "     or lower(u.realName) like lower(concat('%', cast(:keyword as string), '%')) " +
+            "     or lower(u.username) like lower(concat('%', cast(:keyword as string), '%')) " +
+            "     or lower(s.studentNo) like lower(concat('%', cast(:keyword as string), '%'))) " +
             "order by s.id desc")
     Page<Student> search(@Param("keyword") String keyword,
                          @Param("classId") Long classId,

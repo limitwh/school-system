@@ -151,7 +151,9 @@ const userStore = useUserStore()
 
 const MODULE_OPTIONS = [
   { value: 'AUTH', label: '认证' },
-  { value: 'USER', label: '用户管理' }
+  { value: 'USER', label: '用户管理' },
+  { value: 'ACADEMIC', label: '学籍' },
+  { value: 'TIMETABLE', label: '课程表' }
 ]
 
 const ACTION_OPTIONS = [
@@ -160,7 +162,16 @@ const ACTION_OPTIONS = [
   { value: 'SET_PASSWORD', label: '设置初始密码' },
   { value: 'CHANGE_PASSWORD', label: '修改密码' },
   { value: 'RESET_PASSWORD', label: '重置锁定用户密码' },
-  { value: 'RESET_PASSWORD_BY_NAME', label: '按登录名重置用户密码' }
+  { value: 'RESET_PASSWORD_BY_NAME', label: '按登录名重置用户密码' },
+  { value: 'CREATE_STUDENT', label: '新增学生' },
+  { value: 'UPDATE_STUDENT', label: '修改学生' },
+  { value: 'CREATE_CLASS', label: '新增班级' },
+  { value: 'UPDATE_CLASS', label: '修改班级' },
+  { value: 'CREATE_SCHOOL_YEAR', label: '新增学年' },
+  { value: 'SET_CURRENT_SCHOOL_YEAR', label: '设置当前学年' },
+  { value: 'PROMOTE_GRADUATE', label: '升级/毕业' },
+  { value: 'SAVE_GRADE_PLAN', label: '保存课程计划' },
+  { value: 'SAVE_TIMETABLE', label: '保存课表' }
 ]
 
 const MODULE_MAP = Object.fromEntries(MODULE_OPTIONS.map((m) => [m.value, m.label]))
